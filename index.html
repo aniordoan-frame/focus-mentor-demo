@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>FOCUS · ментор</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#07170e; --bg2:#0c2617; --card:rgba(255,255,255,.045); --line:rgba(212,175,55,.22);
+  --green:#1f7a45; --green2:#2fbf71; --gold:#d9b14a; --gold2:#f6dc8a; --gold3:#a9781f;
+  --text:#f3f5f1; --muted:#9fb3a6; --danger:#ff6b6b;
+  --goldgrad:linear-gradient(135deg,#f9e7a6 0%,#d9b14a 45%,#9c6d1a 100%);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{background:var(--bg);color:var(--text);font-family:Manrope,-apple-system,system-ui,sans-serif;min-height:100%}
+body{background:radial-gradient(120% 60% at 80% -10%,#174a2b 0%,transparent 60%),radial-gradient(90% 50% at -10% 30%,#0f3a22 0%,transparent 60%),var(--bg);overflow-x:hidden}
+#chart{position:fixed;inset:0;z-index:0;opacity:.35;pointer-events:none}
+.app{position:relative;z-index:1;max-width:520px;margin:0 auto;padding:16px 16px 96px}
+.top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.logo{font-weight:800;letter-spacing:.5px;font-size:20px}
+.logo b{background:var(--goldgrad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.pill{font-size:12px;color:var(--muted);border:1px solid var(--line);padding:5px 10px;border-radius:999px}
+.card{background:var(--card);border:1px solid rgba(255,255,255,.07);border-radius:20px;padding:16px;margin-bottom:12px;backdrop-filter:blur(6px)}
+.hero{display:flex;gap:16px;align-items:center;background:linear-gradient(160deg,rgba(47,191,113,.16),rgba(255,255,255,.03));border-color:rgba(47,191,113,.25)}
+.ring{width:104px;height:104px;flex:none;position:relative}
+.ring svg{transform:rotate(-90deg)}
+.ring .v{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ring .v b{font-size:26px;font-weight:800}
+.ring .v span{font-size:11px;color:var(--muted)}
+.hi{font-size:13px;color:var(--muted)}
+.hn{font-size:19px;font-weight:800;margin:2px 0 8px;line-height:1.2}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{font-size:12px;padding:5px 9px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08)}
+.chip.g{background:rgba(217,177,74,.14);border-color:rgba(217,177,74,.35);color:var(--gold2)}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;border:0;border-radius:14px;padding:14px;font:700 15px Manrope,sans-serif;color:#0b1a10;background:var(--goldgrad);box-shadow:0 6px 24px rgba(217,177,74,.25);cursor:pointer;margin-top:12px}
+.btn.sec{background:rgba(255,255,255,.07);color:var(--text);box-shadow:none;border:1px solid rgba(255,255,255,.1)}
+.btn.grn{background:linear-gradient(135deg,#3fd585,#1f7a45);color:#fff;box-shadow:0 6px 24px rgba(47,191,113,.25)}
+h2{font-size:15px;font-weight:800;margin:18px 2px 10px;letter-spacing:.3px;text-transform:uppercase;color:var(--gold2)}
+/* path */
+.stage{position:relative;padding-left:30px;margin-bottom:6px}
+.stage:before{content:"";position:absolute;left:10px;top:24px;bottom:-6px;width:2px;background:linear-gradient(var(--line),rgba(212,175,55,.05))}
+.stage:last-child:before{display:none}
+.sh{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.sdot{position:absolute;left:2px;top:3px;width:18px;height:18px;border-radius:50%;border:2px solid var(--gold);background:var(--bg)}
+.stage.done .sdot{background:var(--goldgrad);border-color:transparent}
+.stage.cur .sdot{box-shadow:0 0 0 6px rgba(217,177,74,.15);animation:pulse 1.8s infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 11px rgba(217,177,74,.04)}}
+.sn{font-weight:800;font-size:15px}.sd{font-size:12px;color:var(--muted)}
+.ls{display:flex;align-items:center;gap:12px;padding:12px;border-radius:14px;background:var(--card);border:1px solid rgba(255,255,255,.06);margin-bottom:8px;cursor:pointer;transition:transform .15s}
+.ls:active{transform:scale(.98)}
+.ic{width:34px;height:34px;flex:none;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;background:rgba(255,255,255,.06)}
+.ls.done .ic{background:rgba(47,191,113,.18);color:var(--green2)}
+.ls.cur{border-color:rgba(217,177,74,.5);background:linear-gradient(135deg,rgba(217,177,74,.12),rgba(255,255,255,.02))}
+.ls.cur .ic{background:var(--goldgrad);color:#1a1205}
+.ls.lock{opacity:.45}
+.lt{font-weight:700;font-size:14px;line-height:1.25}.lm{font-size:12px;color:var(--muted);margin-top:2px}
+.goal{font-size:12px;color:var(--gold2);margin:-2px 0 10px 0}
+/* sheet */
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:20;opacity:0;pointer-events:none;transition:.25s}
+.ov.on{opacity:1;pointer-events:auto}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:21;max-width:520px;margin:0 auto;background:linear-gradient(180deg,#123521,#0a1d12);border-top:1px solid var(--line);border-radius:24px 24px 0 0;padding:10px 18px 28px;max-height:88vh;overflow:auto;transform:translateY(100%);transition:transform .35s cubic-bezier(.2,.9,.2,1)}
+.sheet.on{transform:none}
+.grab{width:40px;height:4px;border-radius:4px;background:rgba(255,255,255,.2);margin:4px auto 14px}
+.sk{font-size:12px;color:var(--gold2);font-weight:700;letter-spacing:.4px;text-transform:uppercase}
+.st{font-size:21px;font-weight:800;margin:4px 0 12px;line-height:1.2}
+.video{position:relative;border-radius:16px;overflow:hidden;height:150px;background:linear-gradient(135deg,#0e3a22,#06150c);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;cursor:pointer;margin-bottom:14px}
+.video svg.c{position:absolute;inset:0;opacity:.6}
+.play{width:56px;height:56px;border-radius:50%;background:var(--goldgrad);display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 8px rgba(217,177,74,.18);position:relative}
+.play:after{content:"";border-left:16px solid #1a1205;border-top:10px solid transparent;border-bottom:10px solid transparent;margin-left:4px}
+.vl{position:absolute;right:10px;bottom:8px;font-size:12px;background:rgba(0,0,0,.5);padding:3px 8px;border-radius:8px}
+.blk{margin-bottom:14px}.bh{font-size:13px;font-weight:800;margin-bottom:6px;color:var(--gold2)}
+.blk li{list-style:none;padding-left:18px;position:relative;font-size:14px;line-height:1.45;margin-bottom:6px}
+.blk li:before{content:"";position:absolute;left:2px;top:8px;width:7px;height:7px;border-radius:2px;background:var(--goldgrad);transform:rotate(45deg)}
+.task{font-size:14px;line-height:1.5;padding:12px;border-radius:14px;background:rgba(47,191,113,.08);border:1px dashed rgba(47,191,113,.4)}
+.q{font-weight:700;font-size:15px;margin-bottom:10px;line-height:1.35}
+.opt{width:100%;text-align:left;padding:13px 14px;margin-bottom:8px;border-radius:14px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:var(--text);font:600 14px Manrope,sans-serif;cursor:pointer;transition:.2s}
+.opt.ok{background:rgba(47,191,113,.2);border-color:var(--green2)}
+.opt.no{background:rgba(255,107,107,.12);border-color:var(--danger);animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.fb{font-size:13px;line-height:1.45;color:var(--muted);min-height:18px}
+/* calc */
+.row{display:flex;gap:8px;margin-bottom:10px}
+.seg{display:flex;flex:1;background:rgba(255,255,255,.05);border-radius:12px;padding:3px;border:1px solid rgba(255,255,255,.08)}
+.seg button{flex:1;border:0;background:transparent;color:var(--muted);font:700 13px Manrope;padding:9px 4px;border-radius:9px;cursor:pointer}
+.seg button.on{background:var(--goldgrad);color:#1a1205}
+label.f{display:block;font-size:12px;color:var(--muted);margin-bottom:4px}
+input.n{width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px;color:var(--text);font:700 17px Manrope;outline:none}
+input.n:focus{border-color:var(--gold)}
+.res{display:flex;align-items:flex-end;justify-content:space-between;margin-top:6px;padding:14px;border-radius:16px;background:linear-gradient(135deg,rgba(217,177,74,.16),rgba(217,177,74,.04));border:1px solid rgba(217,177,74,.35)}
+.res b{font-size:34px;font-weight:800;background:var(--goldgrad);-webkit-background-clip:text;background-clip:text;color:transparent;line-height:1}
+.res small{display:block;font-size:12px;color:var(--muted);margin-top:4px}
+.warn{margin-top:10px;font-size:13px;color:#ffd1d1;background:rgba(255,107,107,.1);border:1px solid rgba(255,107,107,.35);padding:10px 12px;border-radius:12px;display:none}
+/* today */
+.ev{display:flex;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+.ev:last-child{border:0}.et{font-weight:800;color:var(--gold2);width:52px;font-size:15px}.en{font-size:14px;font-weight:600}.ew{font-size:12px;color:var(--muted)}
+/* mentor */
+.faq{display:flex;flex-direction:column;gap:8px}
+.fq{padding:13px 14px;border-radius:14px;background:var(--card);border:1px solid rgba(255,255,255,.07);font-size:14px;font-weight:600;cursor:pointer;display:flex;justify-content:space-between;gap:10px}
+.fq span{color:var(--gold)}
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.kpi{padding:14px;border-radius:16px;background:var(--card);border:1px solid rgba(255,255,255,.07)}
+.kpi b{font-size:26px;font-weight:800}.kpi span{display:block;font-size:12px;color:var(--muted);margin-top:2px}
+.kpi.g b{background:var(--goldgrad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.bar{margin-bottom:9px}.bar .bl{display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px}
+.bar .bt{height:8px;border-radius:8px;background:rgba(255,255,255,.07);overflow:hidden}
+.bar .bf{height:100%;border-radius:8px;background:var(--goldgrad);width:0;transition:width 1s}
+.tk{padding:12px;border-radius:14px;background:var(--card);border:1px solid rgba(255,255,255,.07);margin-bottom:8px;font-size:13px}
+.tk b{display:block;font-size:14px;margin-bottom:3px}.tk em{font-style:normal;color:var(--gold2);font-size:12px}
+/* nav */
+.nav{position:fixed;left:0;right:0;bottom:0;z-index:10;display:flex;justify-content:center;padding:10px 12px calc(10px + env(safe-area-inset-bottom));background:linear-gradient(180deg,transparent,rgba(5,16,10,.95) 35%)}
+.nav .in{display:flex;gap:4px;background:rgba(18,45,29,.9);border:1px solid var(--line);border-radius:18px;padding:5px;max-width:520px;width:100%;backdrop-filter:blur(10px)}
+.nav button{flex:1;border:0;background:transparent;color:var(--muted);font:700 12px Manrope;padding:8px 2px;border-radius:13px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px}
+.nav button i{font-style:normal;font-size:18px}
+.nav button.on{background:rgba(217,177,74,.16);color:var(--gold2)}
+.page{display:none;animation:fade .3s}.page.on{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}}
+.toast{position:fixed;left:50%;top:18px;transform:translate(-50%,-80px);z-index:40;background:var(--goldgrad);color:#1a1205;font-weight:800;padding:12px 18px;border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.4);transition:.35s;font-size:14px;white-space:nowrap}
+.toast.on{transform:translate(-50%,0)}
+canvas#cf{position:fixed;inset:0;z-index:50;pointer-events:none}
+.note{font-size:12px;color:var(--muted);text-align:center;margin-top:14px;line-height:1.5}
+</style>
+</head>
+<body>
+<svg id="chart" viewBox="0 0 400 800" preserveAspectRatio="none"></svg>
+<canvas id="cf"></canvas>
+<div class="app">
+  <div class="top">
+    <div class="logo"><b>FOCUS</b> · ментор</div>
+    <div class="pill" id="who">ИИ-ментор 24/7</div>
+  </div>
+
+  <!-- ПУТЬ -->
+  <section class="page on" id="p-path">
+    <div class="card hero">
+      <div class="ring"><svg width="104" height="104"><circle cx="52" cy="52" r="44" stroke="rgba(255,255,255,.08)" stroke-width="9" fill="none"/><circle id="rg" cx="52" cy="52" r="44" stroke="url(#gg)" stroke-width="9" fill="none" stroke-linecap="round" stroke-dasharray="276.5" stroke-dashoffset="276.5" style="transition:stroke-dashoffset 1.2s cubic-bezier(.2,.9,.2,1)"/><defs><linearGradient id="gg" x1="0" x2="1"><stop offset="0" stop-color="#f9e7a6"/><stop offset=".5" stop-color="#d9b14a"/><stop offset="1" stop-color="#9c6d1a"/></linearGradient></defs></svg>
+        <div class="v"><b id="rv">0</b><span>из 13 уроков</span></div></div>
+      <div style="min-width:0">
+        <div class="hi" id="hday">День 1 из 30</div>
+        <div class="hn" id="hnext">Начни с вводного созвона</div>
+        <div class="chips"><span class="chip g" id="hstreak">🔥 серия 1 день</span><span class="chip" id="hstage">Этап: Вход</span></div>
+      </div>
+    </div>
+    <button class="btn" id="cont">▶ Продолжить путь</button>
+    <h2>Твой путь на 30 дней</h2>
+    <div id="stages"></div>
+    <div class="note">Уроки открываются по порядку: так новичок сначала учится считать лот и ставить стоп, а уже потом идет к сигналам.</div>
+  </section>
+
+  <!-- СЕГОДНЯ -->
+  <section class="page" id="p-today">
+    <h2 style="margin-top:4px">План дня</h2>
+    <div class="card" id="plan"></div>
+    <h2>Калькулятор лота</h2>
+    <div class="card">
+      <div class="row"><div class="seg" id="inst"><button class="on" data-v="XAU">Золото</button><button data-v="FX">EURUSD</button></div></div>
+      <label class="f">Категория сигнала</label>
+      <div class="row"><div class="seg" id="cat"><button data-v="2">A+ · 2%</button><button data-v="1">A · 1%</button><button class="on" data-v="0.5">Б · 0,5%</button></div></div>
+      <div class="row">
+        <div style="flex:1"><label class="f">Депозит, $</label><input class="n" id="dep" inputmode="decimal" value="1000"></div>
+        <div style="flex:1"><label class="f">Стоп, пунктов</label><input class="n" id="sl" inputmode="decimal" value="300"></div>
+      </div>
+      <div class="res"><div><small>Объем позиции</small><b id="lot">0,01</b></div><div style="text-align:right"><small>Риск</small><div style="font-weight:800;font-size:18px" id="rsk">5 $</div></div></div>
+      <div class="warn" id="warn">Даже минимальный лот 0,01 дает риск больше нормы категории. По правилам клуба эту сделку пропускаем.</div>
+      <div class="note" id="calcnote">Как в уроке 3: депозит, риск по категории, стоп в пунктах. Пункт = 0,01 у золота и 0,00001 у EURUSD.</div>
+    </div>
+  </section>
+
+  <!-- МЕНТОР -->
+  <section class="page" id="p-mentor">
+    <div class="card hero" style="display:block">
+      <div class="hn" style="margin-top:0">Спроси ИИ-ментора</div>
+      <div class="hi" style="line-height:1.5">Отвечает за секунды по 12 урокам клуба, со ссылкой на урок и минуту. Вопросы про деньги, сделку по скрину или эмоции сразу уходят живому ментору.</div>
+      <button class="btn grn" id="ask">💬 Задать свой вопрос</button>
+    </div>
+    <h2>Частые вопросы клуба</h2>
+    <div class="faq" id="faq"></div>
+  </section>
+
+  <!-- ПАНЕЛЬ -->
+  <section class="page" id="p-panel">
+    <h2 style="margin-top:4px">Панель ментора</h2>
+    <div class="kpis" id="kp"></div>
+    <h2>О чем спрашивают</h2>
+    <div class="card" id="topics"></div>
+    <h2>Ждут ментора</h2>
+    <div id="tickets"></div>
+    <h2>Застряли на пути</h2>
+    <div id="stuck"></div>
+  </section>
+</div>
+
+<div class="ov" id="ov"></div>
+<div class="sheet" id="sheet"></div>
+<div class="toast" id="toast"></div>
+
+<nav class="nav"><div class="in">
+  <button class="on" data-p="path"><i>🧭</i>Путь</button>
+  <button data-p="today"><i>☀️</i>Сегодня</button>
+  <button data-p="mentor"><i>💬</i>Ментор</button>
+  <button data-p="panel" id="navpanel"><i>📊</i>Панель</button>
+</div></nav>
+
+<script>
+const DATA = {"lessons": [{"day": "День 0", "title": "Вводный созвон с Даниилом", "url": "https://t.me/c/3754525229/45", "min": 24, "take": ["Как устроен клуб: стримы, разборы сделок, мини-задания", "Цель: понять логику и торговать самостоятельно, а не ждать сигналов", "Вход только по своей модели: нет слома, нет сделки"], "task": "Заведи заметку «Дневник» и в конце дня пиши 4 строки: какие активы смотрел, что увидел, почему зашел или не зашел, итог дня. Настрой список в TradingView: EUR/USD, XAU/USD, GER40.", "quiz": {"q": "Что ментор советует делать у интересной зоны?", "options": ["Сразу входить, пока цена рядом", "Поставить оповещение и ждать модель", "Открыть сделку без стопа"], "right": 1, "why": "Сразу не берем, ставим оповещение и смотрим, нарисует ли цена нужную модель [16:02].", "hint": "Пересмотри момент про оповещение у зоны [16:02] и про модель входа [19:53]."}}, {"day": "День 0", "title": "Урок 1. Как подвязать аккаунт MT к FXPro", "url": "https://t.me/c/3754525229/57", "min": 2, "take": ["Данные для входа в кабинете FxPro: кнопка «Торговать»", "Сервер, логин MT и пароль: запиши в заметки", "В MT5: «+», FxPro MT5, нужный сервер, логин и пароль"], "task": "Подключи демо-счет FxPro к MT5 и проверь, что в терминале виден баланс. Запиши сервер и логин в заметки.", "quiz": {"q": "Где взять сервер и логин для входа в MT5?", "options": ["В кабинете FxPro по кнопке «Торговать»", "В общем чате клуба", "В настройках TradingView"], "right": 0, "why": "После нажатия «Торговать» в кабинете FxPro появляются сервер, логин и пароль [00:23].", "hint": "Пересмотри начало урока [00:15]–[00:42]."}}, {"day": "День 0", "title": "Урок 2. Работа с MT5", "url": "https://t.me/c/3754525229/58", "min": 2, "take": ["Buy это лонг, стоп ниже цены входа", "SL и TP ставятся перетягиванием линии или двойным кликом по сделке", "Тейк хотя бы 1 к 1 к стопу"], "task": "Открой платформу, найди три инструмента (например, EURUSD, XAUUSD, GER40), добавь в избранное и сделай скриншот рабочего стола с открытыми графиками.", "quiz": {"q": "Открыл Buy. Где будет стоп-лосс?", "options": ["Ниже цены входа", "Выше цены входа", "Стоп для Buy не нужен"], "right": 0, "why": "Для лонга линию тянем ниже, это ограничение по убыткам [00:36].", "hint": "Пересмотри момент про линии SL и TP [00:32]–[00:54]."}}, {"day": "Дни 1–3", "title": "Урок 3. Расчет позиции", "url": "https://t.me/c/3754525229/59", "min": 2, "take": ["Лот считаем в калькуляторе tlap.io: депозит, риск, стоп в пунктах", "Стоп ставим ровно на сумму, которую дал калькулятор", "Риск по категории сигнала: Б не больше 0,5%, А 1%, А+ 2–3%"], "task": "Вбей в калькулятор tlap.io свой депозит, риск 1% и стоп для любого инструмента, напиши лот в чат. Повтори для золота и валютной пары и напиши, чем отличается лотность.", "quiz": {"q": "От чего зависит лот в калькуляторе?", "options": ["Только от депозита", "От количества тейков в сигнале", "От депозита, риска в % и размера стопа"], "right": 2, "why": "В калькулятор вводим размер счета, риск и стоп в пунктах [00:35]–[00:57].", "hint": "Пересмотри, какие поля заполняются в калькуляторе [00:35]–[01:06]."}}, {"day": "Дни 1–3", "title": "Урок 4. Как открыть позицию и ставить TP/SL", "url": "https://t.me/c/3754525229/60", "min": 4, "take": ["Размер контракта: MT5, инструмент, «Свойства». У брокеров он разный", "Вход по рынку или лимитной заявкой (для шорта Sell Limit)", "Если все посчитано, убыток по стопу фиксирован: 1% от 10 000$ = 100$"], "task": "Открой демо-сделку на любом инструменте с выставленными стоп-лоссом и тейк-профитом и пришли скриншот открытой позиции в терминале.", "quiz": {"q": "Зачем смотреть размер контракта в свойствах инструмента?", "options": ["Он у всех брокеров одинаковый", "Он нужен для прогноза цены", "Он разный у брокеров, от него зависит объем"], "right": 2, "why": "Размер контракта зависит от брокера, его надо проверять каждый раз [01:27].", "hint": "Пересмотри часть про «Свойства» и размер контракта [00:37]–[01:51]."}}, {"day": "Дни 4–7", "title": "Урок 5. Особенности торговли золотом", "url": "https://t.me/c/3754525229/93", "min": 2, "take": ["У золота дорогой пункт и высокая волатильность", "Даже минимальный лот может быть всем твоим риском", "Золото не для скальпинга: торгуем по тренду"], "task": "Открой график XAUUSD, найди последние три выраженных движения (вверх или вниз), отметь их на графике и пришли скриншот.", "quiz": {"q": "Какая ошибка новичков на золоте названа в уроке?", "options": ["Слишком широкие стопы и маленький лот", "Большие лоты и тесные стопы", "Торговля только по тренду"], "right": 1, "why": "Новички игнорируют волатильность, берут большие лоты и ставят тесные стопы [01:44].", "hint": "Пересмотри конец урока про ошибки новичков [01:44]–[02:05]."}}, {"day": "Дни 4–7", "title": "Урок 6. Что двигает валюты: логика ликвидности", "url": "https://t.me/c/3754525229/94", "min": 7, "take": ["Стоп-лоссы по границам боковика это топливо рынка", "Крупный капитал набирает объем через чужие стопы, а не одной заявкой по рынку", "Так появляются зоны интереса крупного капитала, от них цена отскакивает"], "task": "Напиши своими словами 3–5 предложений: что, по-твоему, двигает цену на этом рынке и чем это отличается от криптовалют.", "quiz": {"q": "Что ментор называет топливом рынка?", "options": ["Стоп-лоссы по границам бокового движения", "Новости и прогнозы аналитиков", "Индикаторы на графике"], "right": 0, "why": "По границам бокового движения стоят стоп-лоссы, это топливо, на котором цена идет к нужной точке [02:38].", "hint": "Пересмотри момент про боковик и стопы [02:25]–[02:53]."}}, {"day": "Дни 4–7", "title": "Урок 7. Как определять тренд", "url": "https://t.me/c/3754525229/95", "min": 17, "take": ["Key high и key low: закреп над key high подтверждает рост, под key low меняет тренд", "Движение между ними минорное, тренд внутри не ищем", "Без работы с ликвидностью (имбаланс, фрактал) тренд это пустышка"], "task": "Выбери три инструмента и на каждом определи тренд: восходящий, нисходящий или боковик. Кратко объясни почему и приложи график с траекторией и ключевыми точками.", "quiz": {"q": "Цена закрепилась под key low в восходящей структуре. Что это?", "options": ["Подтверждение роста", "Минорное движение, ничего не значит", "Слом структуры, тренд меняется на нисходящий"], "right": 2, "why": "Закреп под ключевым минимумом в восходящей структуре это слом, BOS по терминам урока [02:09] и [04:29].", "hint": "Пересмотри момент про key high и key low [02:01]–[02:24]."}}, {"day": "Дни 8–14", "title": "Урок 8. Импульс и коррекция", "url": "https://t.me/c/3754525229/96", "min": 6, "take": ["Структуру чертим от свечи: пробой ее границы подтверждает импульс", "Внутренний бар игнорируем, ждем обновления максимума или минимума", "Откат не ломает структуру, коррекция ломает"], "task": "Найди на любом графике один импульс и одну коррекцию, обозначь их стрелками или прямоугольниками и пришли в чат.", "quiz": {"q": "Чем коррекция отличается от отката?", "options": ["При коррекции структура сломана", "Коррекция всегда длиннее", "Ничем, это одно и то же"], "right": 0, "why": "Откат: структура не сломана, коррекция: структура сломана [05:36].", "hint": "Пересмотри финал урока [05:27]–[05:45]."}}, {"day": "Дни 8–14", "title": "Урок 9. Ликвидность", "url": "https://t.me/c/3754525229/136", "min": 7, "take": ["Ликвидность это место, куда рядовые трейдеры ставят стопы", "Крупный набирает позицию на чужих стопах: стоп лонга это продажа", "Закрывается он там, где стоят стопы с другой стороны, например за равными максимумами"], "task": "Открой график любого актива. Найди 2 зоны ликвидности (где стоят стопы). Отметь вход, стоп и тейк по логике крупного игрока.", "quiz": {"q": "Почему крупный игрок не покупает весь объем одной рыночной заявкой?", "options": ["Брокер не разрешает большие заявки", "Цена размажется вверх и средняя покупка будет плохой", "Рыночные заявки работают только ночью"], "right": 1, "why": "Заявка будет рыночной, цена уйдет вверх, и покупка будет не по целевой цене [02:52].", "hint": "Пересмотри пример с 300 млрд [02:34]–[03:31]."}}, {"day": "Дни 8–14", "title": "Урок 10. Структурная ликвидность", "url": "https://t.me/c/3754525229/137", "min": 8, "take": ["Структурная точка появляется после работы с ликвидностью", "Внутри тренда это защищенное место для стопа", "После смены тренда те же точки становятся целями для тейка"], "task": "Открой график любого актива. Найди 2 структурные точки (где формировался тренд). Отметь, где ставить стоп и где брать тейк по структуре.", "quiz": {"q": "Тренд сменился. Чем стали структурные точки старого тренда?", "options": ["Местом для стопа, как и раньше", "Ничем, их можно убрать с графика", "Целями доставки цены для тейка"], "right": 2, "why": "В новом тренде структурные точки старого становятся потенциальными целями крупного игрока [04:36].", "hint": "Пересмотри момент про смену тренда на шортовый [04:11]–[05:02]."}}, {"day": "Дни 15–21", "title": "Урок 11. Компрессия", "url": "https://t.me/c/3754525229/138", "min": 5, "take": ["Компрессия это боковик: горизонтальный, наклонный или расческа", "Это скопление стопов за близкими максимумами или минимумами", "Хорошая цель для тейка: часто поглощается импульсом"], "task": "Открой график любого актива. Найди 2 зоны компрессии. Отметь, куда цена их пробила и где бы ты поставил тейк.", "quiz": {"q": "Как ментор предлагает использовать компрессию?", "options": ["Как цель для тейка", "Как место для стопа", "Как сигнал выйти из рынка на неделю"], "right": 0, "why": "Компрессия потенциальная цель доставки цены, за ней удобно ставить тейк [03:14].", "hint": "Пересмотри часть про поглощение компрессии [03:14]–[03:53]."}}, {"day": "Дни 15–21", "title": "Урок 12. Сильные структурные точки", "url": "https://t.me/c/3754525229/139", "min": 5, "take": ["Сильная точка дала агрессивный слом структуры, от нее набираем позицию", "Слабая точка структуру не обновила, это цель для фиксации", "Движение Sell to Buy дает POI: зону интереса, ее край место для стопа"], "task": "Открой график любого актива. Найди один сильный уровень и один слабый, объясни почему. Определи, где бы ты вошел и где зафиксировал прибыль.", "quiz": {"q": "От какой точки ментор советует набирать позицию?", "options": ["От слабой, незащищенной", "От сильной, которая агрессивно сломала структуру", "От любой ближайшей свечи"], "right": 1, "why": "От сильных свингов набираем позицию, слабые точки для фиксации [00:43].", "hint": "Пересмотри теорию в начале урока [00:14]–[00:55]."}}]};
+const BOT = "focus_mentor_demo_bot";
+const tg = window.Telegram && Telegram.WebApp;
+const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+if (tg) { try { tg.ready(); tg.expand(); tg.setHeaderColor("#07170e"); tg.setBackgroundColor("#07170e"); } catch(e){} }
+const H = (() => { try { const h = location.hash.slice(1); const p = new URLSearchParams(h); const s = p.get("s"); return s ? JSON.parse(decodeURIComponent(escape(atob(s.replace(/-/g,"+").replace(/_/g,"/"))))) : {}; } catch(e) { return {}; } })();
+const Q = new URLSearchParams(location.search);
+const DEMO = Q.has("demo");
+const L = DATA.lessons;
+const STAGES = [
+  {n:"Вход", d:"День 0", goal:"Чекпоинт: терминал работает", idx:[0,1,2]},
+  {n:"Безопасность", d:"Дни 1–3", goal:"Чекпоинт: посчитал лот на 1%", idx:[3,4]},
+  {n:"Рынок", d:"Дни 4–7", goal:"Чекпоинт: 3 сделки в дневнике со стопом", idx:[5,6,7]},
+  {n:"Структура", d:"Дни 8–14", goal:"Чекпоинт: разметка графика на разборе", idx:[8,9,10]},
+  {n:"Система", d:"Дни 15–21", goal:"Чекпоинт: свой торговый план, 15 минут с ментором", idx:[11,12]},
+  {n:"Самостоятельность", d:"Дни 22–30", goal:"Торговый план, недельные итоги, челлендж «30 дней по риску»", idx:[]}
+];
+let S = {done: H.done || (DEMO ? [0,1,2,3] : []), joined: H.joined || (DEMO ? Date.now()/1000 - 3*86400 : Date.now()/1000), name: H.name || (tg && tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.first_name) || ""};
+try { const ls = JSON.parse(localStorage.getItem("focus_s") || "null"); if (ls && !H.done && !DEMO) S.done = ls.done || S.done; } catch(e){}
+function save(){ try{ localStorage.setItem("focus_s", JSON.stringify(S)); }catch(e){} try{ tg && tg.CloudStorage && tg.CloudStorage.setItem("s", JSON.stringify({done:S.done})); }catch(e){} }
+const nextIdx = () => { for (let i=0;i<L.length;i++) if (!S.done.includes(i)) return i; return L.length; };
+const haptic = t => { try { tg && tg.HapticFeedback && (t==="ok" ? tg.HapticFeedback.notificationOccurred("success") : t==="no" ? tg.HapticFeedback.notificationOccurred("error") : tg.HapticFeedback.impactOccurred("light")); } catch(e){} };
+function toast(t){ const e=$("#toast"); e.textContent=t; e.classList.add("on"); setTimeout(()=>e.classList.remove("on"),2200); }
+function openLink(u){ if (tg && tg.openTelegramLink && u.startsWith("https://t.me/")) tg.openTelegramLink(u); else window.open(u,"_blank"); }
+
+/* фон: свечной график */
+(function(){ const s=$("#chart"); let x=0,y=520,h=""; for(let i=0;i<46;i++){ const o=y, c=y+(Math.sin(i*.7)*18+(Math.random()-.55)*30); const hi=Math.min(o,c)-Math.random()*14, lo=Math.max(o,c)+Math.random()*14; const g=c<o; h+=`<line x1="${x+4}" x2="${x+4}" y1="${hi}" y2="${lo}" stroke="${g?'#2fbf71':'#d9b14a'}" stroke-width="1" opacity=".5"/><rect x="${x+1}" y="${Math.min(o,c)}" width="6" height="${Math.max(2,Math.abs(c-o))}" fill="${g?'#2fbf71':'#d9b14a'}" opacity=".35"/>`; x+=9; y=c-2; } s.innerHTML=h; })();
+
+function renderHero(){
+  const n=S.done.length, pct=n/L.length; $("#rg").style.strokeDashoffset = 276.5*(1-pct);
+  let k=0; const t=setInterval(()=>{ $("#rv").textContent=Math.min(k,n); if(k++>=n) clearInterval(t); },90);
+  const day = Math.min(30, Math.max(1, Math.floor((Date.now()/1000 - S.joined)/86400)+1));
+  $("#hday").textContent = (S.name ? S.name+", " : "") + "день " + day + " из 30";
+  const ni=nextIdx(); $("#hnext").textContent = ni<L.length ? "Дальше: " + L[ni].title.replace(/^Урок \d+\. /,"") : "База пройдена 🎉";
+  const st = STAGES.find(s=>s.idx.includes(ni)) || STAGES[5]; $("#hstage").textContent = "Этап: " + st.n;
+  $("#hstreak").textContent = "🔥 серия " + Math.max(1, Math.min(day, n+1)) + " " + (Math.min(day,n+1)===1?"день":"дня");
+}
+function renderPath(){
+  const ni=nextIdx(); let h="";
+  STAGES.forEach(st=>{
+    const done = st.idx.length && st.idx.every(i=>S.done.includes(i)), cur = st.idx.includes(ni) || (!st.idx.length && ni>=L.length);
+    h += `<div class="stage ${done?'done':''} ${cur?'cur':''}"><div class="sdot"></div><div class="sh"><div><div class="sn">${st.n}</div><div class="sd">${st.d}</div></div></div><div class="goal">${st.goal}</div>`;
+    st.idx.forEach(i=>{ const l=L[i], d=S.done.includes(i), c=i===ni, lk=i>ni;
+      h += `<div class="ls ${d?'done':''} ${c?'cur':''} ${lk?'lock':''}" data-i="${i}"><div class="ic">${d?'✓':lk?'🔒':'▶'}</div><div><div class="lt">${l.title}</div><div class="lm">${l.min} мин${d?' · пройден':c?' · сейчас':''}</div></div></div>`; });
+    h += `</div>`;
+  });
+  $("#stages").innerHTML=h;
+  $$(".ls").forEach(e=>e.onclick=()=>{ const i=+e.dataset.i; if(i>nextIdx()){ haptic("no"); toast("Сначала пройди предыдущий урок"); return;} openLesson(i); });
+}
+function openLesson(i){
+  haptic(); const l=L[i], q=l.quiz;
+  $("#sheet").innerHTML = `<div class="grab"></div><div class="sk">${l.day}</div><div class="st">${l.title}</div>
+   <div class="video" id="vid"><svg class="c" viewBox="0 0 300 150" preserveAspectRatio="none"><polyline fill="none" stroke="#2fbf71" stroke-width="2" points="0,110 30,95 55,105 80,70 105,82 130,50 160,64 185,40 215,58 245,30 270,44 300,20"/></svg><div class="play"></div><div class="vl">${l.min} мин · Telegram</div></div>
+   <div class="blk"><div class="bh">Что взять из урока</div><ul>${l.take.map(t=>`<li>${t}</li>`).join("")}</ul></div>
+   <div class="blk"><div class="bh">Задание</div><div class="task">${l.task}</div></div>
+   <div class="blk"><div class="bh">Проверка</div><div class="q">${q.q}</div>${q.options.map((o,k)=>`<button class="opt" data-k="${k}">${o}</button>`).join("")}<div class="fb" id="fb"></div></div>`;
+  $("#vid").onclick=()=>openLink(l.url);
+  $$(".opt").forEach(b=>b.onclick=()=>{ const k=+b.dataset.k; $$(".opt").forEach(x=>x.classList.remove("no"));
+    if(k===q.right){ b.classList.add("ok"); haptic("ok"); $("#fb").innerHTML="✅ "+q.why; if(!S.done.includes(i)){ S.done.push(i); save(); }
+      confetti(); setTimeout(()=>{ closeSheet(); renderHero(); renderPath(); toast(nextIdx()<L.length ? "Урок засчитан · открыт следующий" : "База пройдена!"); },1500);
+    } else { b.classList.add("no"); haptic("no"); $("#fb").textContent="Не совсем. "+q.hint; } });
+  $("#ov").classList.add("on"); $("#sheet").classList.add("on");
+}
+function closeSheet(){ $("#ov").classList.remove("on"); $("#sheet").classList.remove("on"); }
+$("#ov").onclick=closeSheet;
+$("#cont").onclick=()=>{ const i=nextIdx(); if(i<L.length) openLesson(i); else toast("Все 12 уроков пройдены 🎉"); };
+
+/* сегодня */
+const WEEK = {1:[["11:00","Обзор рынка","Даниил"],["19:00","Торговый стрим","Айдар"]],2:[["11:00","Торговый стрим","Даниил"],["16:15","Торговый стрим","Патико"]],3:[["11:00","Торговый стрим","Иван"]],4:[["11:00","Торговый стрим","Даниил"],["16:15","Торговый стрим","Патико"]],5:[["11:00","Торговый стрим","Иван"]],6:[],0:[]};
+function renderPlan(){
+  const wd=new Date().getDay(), ev=WEEK[wd], ni=nextIdx();
+  $("#plan").innerHTML = (ev.length ? ev.map(e=>`<div class="ev"><div class="et">${e[0]}</div><div><div class="en">${e[1]}</div><div class="ew">${e[2]} · ссылка Zoom в канале за 5 минут</div></div></div>`).join("") : `<div class="ev"><div class="et">—</div><div><div class="en">Выходные, рынок закрыт</div><div class="ew">Лучшее время пройти урок и разобрать сделки недели</div></div></div>`)
+   + (ni<L.length ? `<div class="ev"><div class="et">📚</div><div><div class="en">${L[ni].title}</div><div class="ew">${L[ni].min} мин · твой урок дня</div></div></div>` : "")
+   + `<div class="ev"><div class="et">🛡</div><div><div class="en">Правило дня</div><div class="ew">Стоп ставим всегда. Риск по категории: A+ 2–3%, A 1%, Б 0,5%</div></div></div>`;
+}
+let inst="XAU", cat=0.5;
+function calc(){ const dep=parseFloat(($("#dep").value||"0").replace(",","."))||0, sl=parseFloat(($("#sl").value||"0").replace(",","."))||0;
+  const risk=dep*cat/100; let lot = sl>0 ? risk/sl : 0;  // $1 за пункт на 1 лот (золото 0,01; EURUSD 0,00001)
+  const l2=Math.floor(lot*100)/100; $("#lot").textContent = l2>=0.01 ? l2.toFixed(2).replace(".",",") : "0,00"; $("#rsk").textContent = (Math.round(risk*100)/100).toString().replace(".",",")+" $";
+  $("#warn").style.display = (sl>0 && dep>0 && l2<0.01) ? "block" : "none"; }
+["#dep","#sl"].forEach(s=>$(s).oninput=calc);
+$$("#inst button").forEach(b=>b.onclick=()=>{ $$("#inst button").forEach(x=>x.classList.remove("on")); b.classList.add("on"); inst=b.dataset.v; $("#sl").value = inst==="XAU"?"300":"150"; haptic(); calc(); });
+$$("#cat button").forEach(b=>b.onclick=()=>{ $$("#cat button").forEach(x=>x.classList.remove("on")); b.classList.add("on"); cat=+b.dataset.v; haptic(); calc(); });
+
+/* ментор */
+const FAQ = ["Что значит «Категория Б» под сигналами?","Как найти NASDAQ в MetaTrader?","Почему сработал стоп, хотя цена не дошла?","Что будет, если оставить золото до понедельника?","Вышел сигнал в обратную сторону, что делать?","Я только вступил. С чего начать?"];
+$("#faq").innerHTML = FAQ.map((f,i)=>`<div class="fq" data-i="${i}">${f}<span>→</span></div>`).join("");
+$$(".fq").forEach(e=>e.onclick=()=>{ haptic(); openLink(`https://t.me/${BOT}?start=q${e.dataset.i}`); });
+$("#ask").onclick=()=>{ haptic(); if (tg && tg.close && tg.initData) tg.close(); else openLink(`https://t.me/${BOT}`); };
+
+/* панель ментора */
+const P = H.m || {q:184, ai:131, esc:53, open:3, topics:[["Записи и расписание",38],["Лот и риск",31],["MT5 и тикеры",29],["Категории сигналов",22],["Стоп и спред",17]], tickets:[["Андрей · урок 4","оцените мою сделку","скрин сделки","2 мин"],["Ирина · 6/13","не проходит перевод FxPro → MT5","деньги и брокер","9 мин"],["Денис · 2/13","слил 20% за день, что делаю не так?","убыток выше 5%","14 мин"]], stuck:[["Урок 3. Расчет позиции",14],["Урок 7. Как определять тренд",9],["Урок 9. Ликвидность",6]]};
+function renderPanel(){
+  const pct = P.q ? Math.round(P.ai/P.q*100) : 0;
+  $("#kp").innerHTML = `<div class="kpi g"><b>${P.q}</b><span>вопросов за неделю</span></div><div class="kpi g"><b>${pct}%</b><span>закрыл ИИ сам</span></div><div class="kpi"><b>${P.esc}</b><span>ушло ментору</span></div><div class="kpi"><b>${P.open}</b><span>ждут ответа</span></div>`;
+  const mx=Math.max(...P.topics.map(t=>t[1]),1);
+  $("#topics").innerHTML = P.topics.map(t=>`<div class="bar"><div class="bl"><span>${t[0]}</span><b>${t[1]}</b></div><div class="bt"><div class="bf" data-w="${t[1]/mx*100}"></div></div></div>`).join("");
+  $("#tickets").innerHTML = P.tickets.map(t=>`<div class="tk"><b>${t[1]}</b>${t[0]} · <em>${t[2]}</em> · ждет ${t[3]}</div>`).join("") || `<div class="note">Очередь пуста 👌</div>`;
+  $("#stuck").innerHTML = P.stuck.map(s=>`<div class="tk"><b>${s[0]}</b>${s[1]} участников дольше 5 дней · <em>напоминание отправит бот</em></div>`).join("");
+  if (!H.m) $("#stuck").innerHTML += `<div class="note">Пример на демо-данных. В рабочем режиме панель собирается из журнала вопросов бота.</div>`;
+  setTimeout(()=>$$(".bf").forEach(b=>b.style.width=b.dataset.w+"%"),80);
+}
+/* навигация */
+$$(".nav button").forEach(b=>b.onclick=()=>{ haptic(); $$(".nav button").forEach(x=>x.classList.remove("on")); b.classList.add("on"); $$(".page").forEach(p=>p.classList.remove("on")); $("#p-"+b.dataset.p).classList.add("on"); window.scrollTo(0,0); if(b.dataset.p==="panel") renderPanel(); });
+if (Q.get("tab")) { const b=$(`.nav button[data-p="${Q.get("tab")}"]`); b && b.click(); }
+
+/* конфетти */
+function confetti(){ const c=$("#cf"), x=c.getContext("2d"); c.width=innerWidth; c.height=innerHeight; const ps=[...Array(90)].map(()=>({x:innerWidth/2,y:innerHeight*.55,vx:(Math.random()-.5)*12,vy:-Math.random()*14-4,s:Math.random()*6+4,r:Math.random()*6,c:["#f9e7a6","#d9b14a","#2fbf71","#ffffff"][Math.floor(Math.random()*4)]}));
+  let f=0; (function a(){ x.clearRect(0,0,c.width,c.height); ps.forEach(p=>{ p.x+=p.vx; p.y+=p.vy; p.vy+=.45; p.r+=.1; x.save(); x.translate(p.x,p.y); x.rotate(p.r); x.fillStyle=p.c; x.fillRect(-p.s/2,-p.s/4,p.s,p.s/2); x.restore(); }); if(f++<90) requestAnimationFrame(a); else x.clearRect(0,0,c.width,c.height); })(); }
+
+renderHero(); renderPath(); renderPlan(); calc();
+</script>
+</body>
+</html>
