@@ -78,6 +78,9 @@ h2{font-size:15px;font-weight:800;margin:18px 2px 10px;letter-spacing:.3px;text-
 .tcs{display:flex;flex-direction:column;gap:2px}
 .tcb{display:flex;gap:10px;text-align:left;background:none;border:0;border-bottom:1px solid rgba(255,255,255,.06);color:inherit;font:500 13.5px Manrope,sans-serif;padding:7px 2px;cursor:pointer}
 .tcb b{color:var(--gold2);min-width:42px;font-weight:700}
+.exl{margin:0 0 16px;padding:16px;border-radius:18px;border:1px solid rgba(217,177,74,.55);background:linear-gradient(135deg,rgba(217,177,74,.18),rgba(47,191,113,.10));cursor:pointer}
+.exk{font-size:11px;font-weight:800;letter-spacing:.6px;color:var(--gold2)}.ext{font-size:17px;font-weight:800;margin:4px 0}
+.exm{font-size:13px;opacity:.8}.exb{margin-top:10px;font-weight:800;color:var(--gold2)}
 .blk{margin-bottom:14px}.bh{font-size:13px;font-weight:800;margin-bottom:6px;color:var(--gold2)}
 .blk li{list-style:none;padding-left:18px;position:relative;font-size:14px;line-height:1.45;margin-bottom:6px}
 .blk li:before{content:"";position:absolute;left:2px;top:8px;width:7px;height:7px;border-radius:2px;background:var(--goldgrad);transform:rotate(45deg)}
@@ -250,15 +253,18 @@ function renderHero(){
 }
 function renderPath(){
   const ni=nextIdx(); let h="";
+  const ex=L.findIndex(l=>l.video);
+  if(ex>=0) h += `<div class="exl" data-i="${ex}"><div class="exk">ПРИМЕР УРОКА · ПОЛНЫЙ ПАКЕТ</div><div class="ext">${L[ex].title}</div><div class="exm">видео ${L[ex].min} мин · конспект PDF · чек-лист · таймкоды · задание</div><div class="exb">Открыть урок ›</div></div>`;
   STAGES.forEach(st=>{
     const done = st.idx.length && st.idx.every(i=>S.done.includes(i)), cur = st.idx.includes(ni) || (!st.idx.length && ni>=L.length);
     h += `<div class="stage ${done?'done':''} ${cur?'cur':''}"><div class="sdot"></div><div class="sh"><div><div class="sn">${st.n}</div><div class="sd">${st.d}</div></div></div><div class="goal">${st.goal}</div>`;
-    st.idx.forEach(i=>{ const l=L[i], d=S.done.includes(i), c=i===ni, lk=i>ni;
+    st.idx.forEach(i=>{ const l=L[i], d=S.done.includes(i), c=i===ni, lk=i>ni && !l.video;
       h += `<div class="ls ${d?'done':''} ${c?'cur':''} ${lk?'lock':''}" data-i="${i}"><div class="ic">${d?'✓':lk?'🔒':'▶'}</div><div><div class="lt">${l.title}</div><div class="lm">${l.min} мин${d?' · пройден':c?' · сейчас':''}</div></div></div>`; });
     h += `</div>`;
   });
   $("#stages").innerHTML=h;
-  $$(".ls").forEach(e=>e.onclick=()=>{ const i=+e.dataset.i; if(i>nextIdx()){ haptic("no"); toast("Сначала пройди предыдущий урок"); return;} openLesson(i); });
+  $$(".exl").forEach(e=>e.onclick=()=>openLesson(+e.dataset.i));
+  $$(".ls").forEach(e=>e.onclick=()=>{ const i=+e.dataset.i; if(i>nextIdx() && !L[i].video){ haptic("no"); toast("Сначала пройди предыдущий урок"); return;} openLesson(i); });
 }
 function openLesson(i){
   haptic(); const l=L[i], q=l.quiz;
